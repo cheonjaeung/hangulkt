@@ -15,26 +15,21 @@ defaults:
 
 jobs:
   test:
-    name: Test (${{ matrix.os }})
+    name: Test (${{ matrix.target }})
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            tasks: >-
-              jvmTest
-              jsTest
-              wasmJsTest
-              wasmWasiTest
-              linuxX64Test
-          - os: macos-latest
-            tasks: >-
-              macosArm64Test
-              iosSimulatorArm64Test
-              watchosSimulatorArm64Test
-              tvosSimulatorArm64Test
-          - os: windows-latest
-            tasks: mingwX64Test
+          - { target: jvm, os: ubuntu-latest }
+          - { target: js, os: ubuntu-latest }
+          - { target: wasmJs, os: ubuntu-latest }
+          - { target: wasmWasi, os: ubuntu-latest }
+          - { target: linuxX64, os: ubuntu-latest }
+          - { target: macosArm64, os: macos-latest }
+          - { target: iosSimulatorArm64, os: macos-latest }
+          - { target: watchosSimulatorArm64, os: macos-latest }
+          - { target: tvosSimulatorArm64, os: macos-latest }
+          - { target: mingwX64, os: windows-latest }
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -50,4 +45,4 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Run Test Task
-        run: ./gradlew ${{ matrix.tasks }}
+        run: ./gradlew ${{ matrix.target }}Test
