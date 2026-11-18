@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    name: Test (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: jvm, os: ubuntu-latest }
+          - { target: js, os: ubuntu-latest }
+          - { target: wasmJs, os: ubuntu-latest }
+          - { target: wasmWasi, os: ubuntu-latest }
+          - { target: linuxX64, os: ubuntu-latest }
+          - { target: macosArm64, os: macos-latest }
+          - { target: iosSimulatorArm64, os: macos-latest }
+          - { target: watchosSimulatorArm64, os: macos-latest }
+          - { target: tvosSimulatorArm64, os: macos-latest }
+          - { target: mingwX64, os: windows-latest }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup JDK
+        uses: actions/setup-java@v6
+        with:
+          distribution: zulu
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Run Test Task
+        run: ./gradlew ${{ matrix.target }}Test
