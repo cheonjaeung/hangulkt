@@ -27,7 +27,10 @@ package com.cheonjaeung.hangulkt
  * @see endsWithDoubleBatchim
  */
 public fun String.endsWithBatchim(): Boolean {
-    TODO("Not implemented yet")
+    if (this.isEmpty()) return false
+    val lastChar = this.last()
+    if (!lastChar.isCompleteHangul()) return false
+    return lastChar.jongseongIndex() != 0
 }
 
 /**
@@ -61,7 +64,11 @@ public fun String.endsWithBatchim(): Boolean {
  * @see endsWithDoubleBatchim
  */
 public fun String.endsWithSingleBatchim(): Boolean {
-    TODO("Not implemented yet")
+    if (this.isEmpty()) return false
+    val lastChar = this.last()
+    if (!lastChar.isCompleteHangul()) return false
+    val jongseongIndex = lastChar.jongseongIndex()
+    return jongseongIndex != 0 && !jongseongIndex.isDoubleJongseongIndex()
 }
 
 /**
@@ -96,5 +103,21 @@ public fun String.endsWithSingleBatchim(): Boolean {
  * @see endsWithSingleBatchim
  */
 public fun String.endsWithDoubleBatchim(): Boolean {
-    TODO("Not implemented yet")
+    if (this.isEmpty()) return false
+    val lastChar = this.last()
+    val jongseongIndex = lastChar.jongseongIndex()
+    return jongseongIndex != 0 && jongseongIndex.isDoubleJongseongIndex()
 }
+
+/**
+ * Returns `true` if this [Char] is a complete Hangul character, such as '가'.
+ */
+private fun Char.isCompleteHangul(): Boolean = this in '가'..'힣'
+
+private fun Char.jongseongIndex(): Int = (this.code - '가'.code) % JONGSEONG_COUNT
+
+private fun Int.isDoubleJongseongIndex(): Boolean {
+    return this == 3 || this == 5 || this == 6 || this in 9..15 || this == 18
+}
+
+private const val JONGSEONG_COUNT: Int = 28
